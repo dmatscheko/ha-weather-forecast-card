@@ -117,6 +117,32 @@ describe("weather-forecast-card", () => {
     expect(elConditionState?.textContent.trim()).toBe("Sunny");
   });
 
+  it("should override title with state_entity when configured", async () => {
+    const overrideConfig: WeatherForecastCardConfig = {
+      ...testConfig,
+      current: { state_entity: "sensor.temperature_outdoor" },
+    };
+
+    const overrideCard = await fixture<WeatherForecastCard>(
+      html`<weather-forecast-card
+        .hass=${hass}
+        .config=${overrideConfig}
+      ></weather-forecast-card>`
+    );
+    overrideCard.setConfig(overrideConfig);
+    await overrideCard.updateComplete;
+    await new Promise((resolve) => setTimeout(resolve, 150));
+
+    const stateEl = overrideCard.shadowRoot!.querySelector(
+      ".wfc-current-state"
+    );
+    expect(stateEl?.textContent?.trim()).toBe(
+      hass
+        .formatEntityState(hass.states["sensor.temperature_outdoor"])
+        ?.trim()
+    );
+  });
+
   it("should recalculate layout if forecast item count changes", async () => {
     const container = card.shadowRoot!.querySelector(
       ".wfc-forecast-container"

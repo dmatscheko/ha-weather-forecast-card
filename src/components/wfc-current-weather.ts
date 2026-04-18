@@ -76,6 +76,7 @@ export class WfcCurrentWeather extends LitElement {
     const attributes = this.getConfiguredAttributes();
     const name =
       this.config.name || this.weatherEntity.attributes.friendly_name;
+    const stateLabel = this.getStateLabel();
 
     return html`
       <div class="wfc-current-weather">
@@ -87,9 +88,7 @@ export class WfcCurrentWeather extends LitElement {
             .classes=${"wfc-current-icon"}
           ></wfc-weather-condition-icon-provider>
           <div class="wfc-name-state">
-            <span class="wfc-current-state">
-              ${this.hass.formatEntityState(this.weatherEntity)}
-            </span>
+            <span class="wfc-current-state"> ${stateLabel} </span>
             ${name
               ? html`<span class="wfc-name wfc-secondary">${name}</span>`
               : nothing}
@@ -202,6 +201,17 @@ export class WfcCurrentWeather extends LitElement {
 
     handleAction(this, this.hass!, config, event.detail.action);
   };
+
+  private getStateLabel(): string | undefined {
+    const stateEntityId = this.config.current?.state_entity;
+    if (stateEntityId) {
+      const stateEntity = this.hass.states[stateEntityId];
+      if (stateEntity) {
+        return this.hass.formatEntityState(stateEntity);
+      }
+    }
+    return this.hass.formatEntityState(this.weatherEntity);
+  }
 
   private getTemperature(): string | null {
     const temperatureEntity = this.config.current?.temperature_entity;

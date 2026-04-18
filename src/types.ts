@@ -101,6 +101,7 @@ export interface WeatherForecastCardCurrentConfig {
   temperature_precision?: number;
   secondary_info_attribute?: CurrentWeatherAttributes;
   temperature_entity?: string;
+  state_entity?: string;
 }
 
 export interface WeatherForecastCardForecastActionConfig {

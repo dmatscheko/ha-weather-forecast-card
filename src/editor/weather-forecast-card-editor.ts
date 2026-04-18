@@ -202,6 +202,11 @@ export class WeatherForecastCardEditor
         optional: true,
       },
       {
+        name: "current.state_entity",
+        selector: { entity: {} },
+        optional: true,
+      },
+      {
         name: "current.show_attributes",
         default: false,
         optional: true,
@@ -569,6 +574,11 @@ export class WeatherForecastCardEditor
           this.hass!.localize("ui.panel.lovelace.editor.card.generic.entity") ||
           "entity"
         ).toLocaleLowerCase()}`;
+      case "current.state_entity":
+        return `State ${(
+          this.hass!.localize("ui.panel.lovelace.editor.card.generic.entity") ||
+          "entity"
+        ).toLocaleLowerCase()}`;
       case "forecast_mode":
         return this.hass!.localize(
           "ui.panel.lovelace.editor.card.weather-forecast.weather_to_show"
@@ -650,6 +660,8 @@ export class WeatherForecastCardEditor
     switch (schema.name) {
       case "current.temperature_entity":
         return "Optional temperature sensor entity to override the weather entity's temperature.";
+      case "current.state_entity":
+        return "Optional entity whose formatted state overrides the weather condition shown as the main title.";
       case "default_forecast":
         return "Select the default forecast type to show when forecasts are enabled. Users can still toggle between hourly and daily forecasts if both are available.";
       case "current.show_attributes":
