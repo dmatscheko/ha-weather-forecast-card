@@ -233,6 +233,17 @@ export const average = (data: number[]): number => {
   return data.reduce((a, b) => a + b, 0) / data.length;
 };
 
+export const isSubHourlyForecast = (
+  forecast: { datetime?: string }[] | undefined
+): boolean => {
+  if (!forecast?.length) return false;
+  return forecast.some((entry) => {
+    if (!entry.datetime) return false;
+    const date = new Date(entry.datetime);
+    return date.getMinutes() !== 0 || date.getSeconds() !== 0;
+  });
+};
+
 export const endOfHour = (input: Date | string): Date => {
   const d = typeof input === "string" ? new Date(input) : new Date(input);
 

@@ -206,10 +206,16 @@ export const TEST_FORECAST_DAILY: ForecastAttribute[] = Array.from(
   })
 );
 
+const HOURLY_FORECAST_START = (() => {
+  const d = new Date();
+  d.setMinutes(0, 0, 0);
+  return d.getTime();
+})();
+
 export const TEST_FORECAST_HOURLY: ForecastAttribute[] = Array.from(
   { length: 3 * 24 },
   (_, i) => ({
-    datetime: new Date(Date.now() + i * 3600000).toISOString(),
+    datetime: new Date(HOURLY_FORECAST_START + i * 3600000).toISOString(),
     temperature: random(15, 25),
     condition: i % 3 === 0 ? "sunny" : i % 3 === 1 ? "cloudy" : "rainy",
     precipitation: i % 3 === 2 ? 5 : 0,

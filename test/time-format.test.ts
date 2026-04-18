@@ -246,6 +246,54 @@ describe("time format rendering", () => {
     });
   });
 
+  describe("sub-hourly forecast (e.g. quarter-hourly source)", () => {
+    const SUB_HOURLY_FORECAST = TEST_FORECAST_HOURLY.map((entry, i) => ({
+      ...entry,
+      datetime: new Date(
+        new Date(entry.datetime!).getTime() + 15 * 60 * 1000
+      ).toISOString(),
+      _idx: i,
+    }));
+
+    it("should render hour:minute when source isn't aligned to full hours", async () => {
+      const mockHassInstance = new MockHass({ use12HourClock: false });
+      mockHassInstance.dailyForecast = TEST_FORECAST_DAILY;
+      mockHassInstance.hourlyForecast = SUB_HOURLY_FORECAST;
+      const hass = mockHassInstance.getHass() as ExtendedHomeAssistant;
+
+      const card = await fixture<WeatherForecastCard>(
+        html`<weather-forecast-card
+          .hass=${hass}
+          .config=${testConfig}
+        ></weather-forecast-card>`
+      );
+      card.setConfig(testConfig);
+      await card.updateComplete;
+      await new Promise((resolve) => setTimeout(resolve, 150));
+
+      const forecastElement = card.shadowRoot!.querySelector(
+        "wfc-forecast-chart, wfc-forecast-simple"
+      );
+      forecastElement?.dispatchEvent(
+        new CustomEvent("action", {
+          bubbles: true,
+          composed: true,
+          detail: { action: "tap" },
+        })
+      );
+      await card.updateComplete;
+      await new Promise((resolve) => setTimeout(resolve, 150));
+
+      const firstTimeLabel = card.shadowRoot!.querySelector(
+        ".wfc-forecast-slot .wfc-forecast-slot-time"
+      );
+      expect(firstTimeLabel).not.toBeNull();
+      expect(firstTimeLabel?.textContent?.trim()).toBe(
+        formatTimeParts(hass, SUB_HOURLY_FORECAST[0].datetime!).time
+      );
+    });
+  });
+
   describe("formatHourParts helper", () => {
     it("should return hour without suffix for 24-hour format", () => {
       const mockHassInstance = new MockHass({ use12HourClock: false });

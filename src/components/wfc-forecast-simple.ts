@@ -9,7 +9,7 @@ import {
   ForecastActionDetails,
   WeatherForecastCardConfig,
 } from "../types";
-import { formatDay } from "../helpers";
+import { formatDay, isSubHourlyForecast } from "../helpers";
 import {
   ForecastAttribute,
   ForecastType,
@@ -52,6 +52,8 @@ export class WfcForecastSimple extends LitElement {
       getWeatherUnit(this.hass, this.weatherEntity, "precipitation"),
       this.forecastType
     );
+    const isSubHourly =
+      this.forecastType === "hourly" && isSubHourlyForecast(this.forecast);
 
     let currentDay: string | undefined;
 
@@ -79,6 +81,7 @@ export class WfcForecastSimple extends LitElement {
             .forecast=${forecast}
             .forecastType=${this.forecastType}
             .isTwiceDailyEntity=${this.isTwiceDailyEntity}
+            .isSubHourly=${isSubHourly}
             .config=${this.config}
           ></wfc-forecast-header-items>
           <wfc-forecast-details

@@ -1,7 +1,7 @@
 import { html, LitElement, nothing, PropertyValues, TemplateResult } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
 import { DragScrollController } from "../controllers/drag-scroll-controller";
-import { formatDay } from "../helpers";
+import { formatDay, isSubHourlyForecast } from "../helpers";
 import { styleMap } from "lit/directives/style-map.js";
 import { classMap } from "lit/directives/class-map.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
@@ -856,6 +856,8 @@ export class WfcForecastChart extends LitElement {
   private renderHeaderItems(forecast: ForecastAttribute[]): TemplateResult[] {
     const parts: TemplateResult[] = [];
     let currentDay: string | undefined;
+    const isSubHourly =
+      this.forecastType === "hourly" && isSubHourlyForecast(forecast);
 
     forecast.forEach((item, index) => {
       if (!item.datetime) {
@@ -881,6 +883,7 @@ export class WfcForecastChart extends LitElement {
             .forecast=${item}
             .forecastType=${this.forecastType}
             .isTwiceDailyEntity=${this.isTwiceDailyEntity}
+            .isSubHourly=${isSubHourly}
             .config=${this.config}
           ></wfc-forecast-header-items>
         </div>

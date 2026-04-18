@@ -29,6 +29,7 @@ export class WfcForecastHeaderItems extends LitElement {
   @property({ attribute: false }) forecast!: ForecastAttribute;
   @property({ attribute: false }) forecastType!: ForecastType;
   @property({ attribute: false }) isTwiceDailyEntity = false;
+  @property({ attribute: false }) isSubHourly = false;
   @property({ attribute: false }) config!: WeatherForecastCardConfig;
 
   private suntimesInfo?: SuntimesInfo | null;
@@ -193,7 +194,23 @@ export class WfcForecastHeaderItems extends LitElement {
       };
     }
 
-    // Regular hourly forecast
+    // Regular hourly forecast — use hour:minute when source isn't aligned to full hours
+    if (this.isSubHourly) {
+      const timeParts = formatTimeParts(this.hass, displayDate);
+
+      if (this.isTwiceDailyEntity && !isAmPm) {
+        return {
+          label: "",
+          secondaryLabel: timeParts.time,
+        };
+      }
+
+      return {
+        label: timeParts.time,
+        secondaryLabel: isAmPm ? timeParts.suffix : undefined,
+      };
+    }
+
     const hourParts = formatHourParts(this.hass, displayDate);
 
     // For twice_daily entity, use two-row layout for consistency with daily view
